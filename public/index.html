@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StarkFlow Notification API Test</title>
+<style>
+body{font-family:Arial,sans-serif;max-width:760px;margin:36px auto;padding:0 16px;color:#202124}
+label{display:block;margin:12px 0 5px;font-weight:600}
+input,textarea,select{width:100%;box-sizing:border-box;padding:10px;border:1px solid #bbb;border-radius:6px}
+textarea{min-height:75px}button{margin-top:18px;padding:11px 16px;border:0;border-radius:6px;background:#222;color:#fff;cursor:pointer}
+.note{background:#f5f5f5;padding:12px;border-radius:8px;line-height:1.45}
+#result{white-space:pre-wrap;margin-top:16px}
+</style>
+</head>
+<body>
+<h1>StarkFlow email notification test</h1>
+<p class="note">This is a basic backend test form, not your full task tracker UI. Add the API key configured in Render. Do not share it publicly.</p>
+<form id="taskForm">
+<label>API key</label><input id="apiKey" type="password" required autocomplete="off">
+<label>Task name *</label><input id="taskName" required>
+<label>Assignee email *</label><input id="assigneeEmail" type="email" required>
+<label>Assignee name</label><input id="assigneeName">
+<label>Client</label><input id="client">
+<label>Assign date</label><input id="assignDate" type="date">
+<label>Due date</label><input id="dueDate" type="date">
+<label>Task owner</label><input id="owner">
+<label>Priority</label><select id="priority"><option>Medium</option><option>Low</option><option>High</option><option>Urgent</option></select>
+<label>Description</label><textarea id="description"></textarea>
+<button type="submit">Send test notification</button>
+</form>
+<div id="result"></div>
+<script>
+document.getElementById("taskForm").addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const result = document.getElementById("result");
+  result.textContent = "Sending request…";
+  const val = (id) => document.getElementById(id).value;
+  const payload = {
+    taskName: val("taskName"), assigneeEmail: val("assigneeEmail"),
+    assigneeName: val("assigneeName"), client: val("client"),
+    assignDate: val("assignDate"), dueDate: val("dueDate"),
+    owner: val("owner"), priority: val("priority"), description: val("description")
+  };
+  try {
+    const response = await fetch("/api/task-assigned", {
+      method: "POST",
+      headers: {"Content-Type":"application/json", "x-api-key":val("apiKey")},
+      body: JSON.stringify(payload)
+    });
+    const data = await response.json();
+    result.textContent = JSON.stringify(data, null, 2);
+  } catch (err) {
+    result.textContent = "Request failed: " + err.message;
+  }
+});
+</script>
+</body>
+</html>
